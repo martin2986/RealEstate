@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 
 import { catchErrors } from '../utils/catchError';
 import prisma from '../lib/prisma';
-import AppError from '../utils/AppError';
 import { expiryDate, generateJWT } from '../utils/util';
+import AppError from '../utils/appError';
 export const signup = catchErrors(async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -36,9 +36,17 @@ export const signin = catchErrors(async (req: Request, res: Response) => {
     expires: expiryDate,
     httpOnly: true,
   };
-  res.cookie('token', token, cookieOption).status(200).json({
-    message: 'Logged in successfully',
-  });
+  res
+    .cookie('token', token, cookieOption)
+    .status(200)
+    .json({
+      message: 'Logged in successfully',
+      result: {
+        username: user.username,
+        email: user.email,
+        profilePhoto: user.avatar,
+      },
+    });
 });
 
 export const logout = (req: Request, res: Response) => {

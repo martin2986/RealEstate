@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import AppError from './AppError';
+import AppError from './appError';
 
 const handleCastError = (err: any) => {
   const message = `Invalid ${err.path}: ${err.value}`;
