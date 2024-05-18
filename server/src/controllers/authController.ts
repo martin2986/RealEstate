@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 
 import { catchErrors } from '../utils/catchError';
 import prisma from '../lib/prisma';
+import AppError from '../utils/AppError';
+import { expiryDate, generateJWT } from '../utils/util';
 export const signup = catchErrors(async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -17,3 +19,28 @@ export const signup = catchErrors(async (req: Request, res: Response) => {
     message: 'User created successfully',
   });
 });
+
+export const signin = catchErrors(async (req: Request, res: Response) => {
+  const { password, username } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  });
+  if (!user) return new AppError('User not found', 401);
+
+  const isMatch = bcrypt.compareSync(password, user.password);
+  if (!isMatch) return new AppError('Invalid Credentials', 401);
+  const token = generateJWT({ id: user.id });
+  const cookieOption = {
+    expires: expiryDate,
+    httpOnly: true,
+  };
+  res.cookie('token', token, cookieOption).status(200).json({
+    message: 'Logged in successfully',
+  });
+});
+
+export const logout = (req: Request, res: Response) => {
+  res.clearCookie('token').status(200).json({ message: 'Logout successfully' });
+};
