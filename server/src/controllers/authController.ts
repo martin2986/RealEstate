@@ -45,6 +45,7 @@ export const signin = catchErrors(async (req: Request, res: Response) => {
         username: user.username,
         email: user.email,
         profilePhoto: user.avatar,
+        id: user.id,
       },
     });
 });
