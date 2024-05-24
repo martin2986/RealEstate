@@ -27,15 +27,17 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  if (process.env.NODE_ENV === 'development') {
-    developmentErrors(err, req, res, next);
-  } else {
-    res.status(err.statusCode).json({
-      success: false,
-      status: 'error',
-      message: 'something went wong',
-    });
-  }
+  if (process.env.NODE_ENV === 'development') developmentErrors(err, req, res, next);
+
+  // {
+
+  // } else {
+  //   res.status(err.statusCode).json({
+  //     success: false,
+  //     status: 'error',
+  //     message: 'something went wong',
+  //   });
+  // }
 
   if (err.name === 'CastError') err = handleCastError(err);
   if (err.name == 'ValidationError') err = handleValidationError(err);

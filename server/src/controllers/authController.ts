@@ -27,27 +27,22 @@ export const signin = catchErrors(async (req: Request, res: Response) => {
       username,
     },
   });
-  if (!user) return new AppError('User not found', 401);
+  if (!user) throw new AppError('User not found', 401);
 
   const isMatch = bcrypt.compareSync(password, user.password);
-  if (!isMatch) return new AppError('Invalid Credentials', 401);
+  if (!isMatch) throw new AppError('Invalid Credentials', 401);
   const token = generateJWT({ id: user.id });
   const cookieOption = {
     expires: expiryDate,
     httpOnly: true,
   };
-  res
-    .cookie('token', token, cookieOption)
-    .status(200)
-    .json({
-      message: 'Logged in successfully',
-      result: {
-        username: user.username,
-        email: user.email,
-        profilePhoto: user.avatar,
-        id: user.id,
-      },
-    });
+  res.cookie('token', token, cookieOption).status(200).json({
+    message: 'Logged in successfully',
+    username: user.username,
+    email: user.email,
+    profilePhoto: user.avatar,
+    id: user.id,
+  });
 });
 
 export const logout = (req: Request, res: Response) => {

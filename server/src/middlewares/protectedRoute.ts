@@ -16,7 +16,6 @@ export const protectRoute = catchErrors(async (req: Request, res: Response, next
       id: decoded.id,
     },
   });
-  console.log(currentUser);
   if (!currentUser) {
     return next(new AppError('Token is not valid', 401));
   }

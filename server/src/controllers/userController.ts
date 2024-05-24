@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { catchErrors } from '../utils/catchError';
-import { ParsedQs } from 'qs';
+import bcrypt from 'bcrypt';
+import AppError from '../utils/appError';
 export const getUsers = catchErrors(async (req: Request, res: Response) => {
   const users = await prisma.user.findMany();
   res.status(200).json(users);
@@ -23,23 +24,25 @@ export const getUser = catchErrors(async (req: Request, res: Response) => {
 });
 export const updateUser = catchErrors(async (req: Request, res: Response) => {
   const id = req.query.id as string;
-  const tokenUserId = req.body.userId;
-  //   const tokenUserId = req.userId;
-  const user = await prisma.user.update({
+  const { password, email, username, profilePhoto } = req.body;
+  let updatedPassword;
+  if (password) updatedPassword = await bcrypt.hash(password, 10);
+  const updatedUser = await prisma.user.update({
     where: {
       id,
     },
     data: {
-      username: req.body.username,
-      email: req.body.email,
-      avatar: req.body.avatar,
+      email,
+      username,
+      avatar: profilePhoto,
+      ...(updatedPassword && { password: updatedPassword }),
     },
   });
   res.status(200).json({
-    username: user.username,
-    email: user.email,
-    profilePhoto: user.avatar,
-    id: user.id,
+    username: updatedUser.username,
+    email: updatedUser.email,
+    profilePhoto: updatedUser.avatar,
+    id: updatedUser.id,
   });
 });
 export const deleteUser = catchErrors(async (req: Request, res: Response) => {});
