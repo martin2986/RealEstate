@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRouter from './routes/authRoute';
 import userRouter from './routes/userRoute';
+import postRouter from './routes/postRoutes';
 import { errorHandler } from './utils/errorHandler';
 import AppError from './utils/appError';
 
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/posts', postRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Api url ${req.originalUrl} does not exist`, 404));
