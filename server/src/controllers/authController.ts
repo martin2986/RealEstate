@@ -35,6 +35,7 @@ export const signin = catchErrors(async (req: Request, res: Response) => {
   const cookieOption = {
     expires: expiryDate,
     httpOnly: true,
+    secure: false,
   };
   res.cookie('token', token, cookieOption).status(200).json({
     message: 'Logged in successfully',

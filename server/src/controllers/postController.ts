@@ -12,14 +12,28 @@ export const getPost = catchErrors(async (req: Request, res: Response) => {
     where: {
       id: req.params.id,
     },
+    include: {
+      postDetail: true,
+      user: {
+        select: {
+          username: true,
+          avatar: true,
+        },
+      },
+    },
   });
   res.status(200).json(post);
 });
 export const addPost = catchErrors(async (req: Request, res: Response) => {
   const newPost = await prisma.post.create({
     data: {
-      ...req.body,
+      ...req.body.postData,
       userId: req.query.id,
+      postDetail: {
+        create: {
+          ...req.body.postDetail,
+        },
+      },
     },
   });
   res.status(200).json(newPost);
@@ -30,7 +44,7 @@ export const updatePost = catchErrors(async (req: Request, res: Response) => {
       id: req.params.id,
     },
   });
-  res.status(200).json('sdsds');
+  res.status(200).json(post);
 });
 export const deletePost = catchErrors(async (req: Request, res: Response) => {
   const id = req.params.id as string;
